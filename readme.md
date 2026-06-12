@@ -1,5 +1,5 @@
 
-![Python](https://img.shields.io/badge/Python-3.12+-blue) ![Status](https://img.shields.io/badge/status-em%20desenvolvimento-green)
+![Python](https://img.shields.io/badge/Python-3.12+-blue) ![Status](https://img.shields.io/badge/status-em%20desenvolvimento-green) [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/raphael-cortes-b0b544305/) [![Instagram](https://img.shields.io/badge/Instagram-E4405F?style=flat&logo=instagram&logoColor=white)](https://www.instagram.com/raphaelcorte_s/) [![WhatsApp](https://img.shields.io/badge/WhatsApp-25D366?style=flat&logo=whatsapp&logoColor=white)](https://wa.me/5561998294492)
 # Sistema Bancário em Python
 
 Sistema bancário digital, com as funcionalidades de adicionar cliente, criar uma conta, vincular conta ao cliente, depositar, sacar e ver extrato da conta
@@ -174,7 +174,8 @@ Durante o desenvolvimento deste projeto, foram consolidados os seguintes conceit
 
 ## 📝 TODO List
 
-- Persistência de dados em banco de dados
-- API REST
-- Sistema de autenticação
-- Implementação de testes automatizados
+- [x] Persistência de dados em banco de dados: cadastro de clientes, criação de conta e vinculação de conta ao cliente
+- [ ] Persistência de dados em banco de dados: extrato
+- [ ] API REST
+- [ ] Sistema de autenticação
+- [ ] Implementação de testes automatizados

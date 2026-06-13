@@ -16,36 +16,34 @@ Este projeto foi desenvolvido para aplicar e compreender na prática os conceito
 ```bash
 
 .
-
-├──  entidades
-
-│  ├──  cliente.py
-
-│  ├──  conta.py
-
-│  └──  __init__.py
-
+│   banco.db
+│   main.py
+│   readme.md
 │
-
-├──  operacoes
-
-│  ├──  banco.py
-
-│  └──  __init__.py
-
+├───database
+│       criar_db.py
+│       queries.py
+│       __init__.py
 │
-
-├──  utilitarios
-
-│  ├──  exceptions.py
-
-│  └──  __init__.py
-
+├───entidades
+│       cliente.py
+│       conta.py
+│       __init__.py
 │
+├───modelagem_db
+│       modelo_logico_sistemabancario.mwb
+│       modelo_logico_sistemabancario.mwb.bak
+│
+├───operacoes
+│      banco.py
+│      __init__.py
+│   
+│
+└───utilitarios
+        exceptions.py
+        __init__.py
+    
 
-├──  main.py
-
-└──  README.md
 
 ```
 

@@ -55,7 +55,7 @@ class Banco:
         
         return novo_cliente
     
-    # Busca um CLiente pelo CPF.
+    # Busca um Cliente pelo CPF.
     def buscar_cliente(self, cpf: str) -> Cliente:
         
         # Verifica se o Cliente já está na memória
@@ -70,7 +70,7 @@ class Banco:
         cursor = conexao.cursor()
         
         # Faz a busca do cliente pelo CPF, utilizando o SELECT. A tupla resultante é salva na variável linha.
-        cursor.execute("SELECT id_cliente, nome_cliente, cpf_cliente FROM tbl_cliente WHERE cpf_cliente = ?", (cpf,))
+        cursor.execute("SELECT id, nome, cpf FROM tbl_cliente WHERE cpf = ?", (cpf,))
         linha = cursor.fetchone()
         conexao.close()
 
@@ -92,9 +92,7 @@ class Banco:
     def criar_conta(self, cliente: Cliente, tipo: str) -> Conta:
 
         '''Cria uma nova conta para um cliente existente'''
-
-
-
+        
         # Identifica o caminho para banco.db
         dir_atual = os.path.dirname(os.path.abspath(__file__))
         dir_banco = os.path.join(dir_atual, '..', 'banco.db')
@@ -104,29 +102,31 @@ class Banco:
         cursor = conexao.cursor()
 
         # Padroniza a entrada do tipo de conta e verifica se é valida
-        tipo_conta = tipo.upper()
-        if tipo_conta not in ['C', 'P']:
+        entrada_usuario = tipo.upper()
+        if entrada_usuario not in ['C', 'P']:
             print('Tipo de conta inválido. Digite C para Conta Corrente ou P para Conta Poupança: ')
+            conexao.close()  # Fecha a conexão antes de sair
             return None
+        
+        tipo_db = 'CORRENTE' if entrada_usuario == 'C' else 'POUPANCA'
 
         # Verifica se o Cliente ja possui uma conta do mesmo tipo associada a ele em banco.db
-        tipo_db = tipo_conta
         cursor.execute("""
             SELECT COUNT(*) 
             FROM tbl_conta 
-            WHERE tbl_cliente_id_cliente = ? AND tipo_conta = ?
+            WHERE fk_tbl_cliente_id = ? AND tipo_conta = ?
         """, (cliente.id, tipo_db))
         
         if cursor.fetchone()[0] > 0:
             conexao.close()  # Fecha a conexão antes de sair
-            tipo_texto = "Corrente" if tipo_db == 'C' else "Poupança"
+            tipo_texto = "Corrente" if tipo_db == 'CORRENTE' else "Poupança"
             print(f"Erro: O cliente {cliente.nome} já possui uma Conta {tipo_texto} cadastrada.")
             return None
 
         
         # SELECT MAX() retorna o maior número de conta já existente no banco, para garantir que o próximo número seja único e sequencial. 
         # O resultado é salvo na variável maior_numero.
-        cursor.execute("SELECT MAX(numero_conta) FROM tbl_conta")
+        cursor.execute("SELECT MAX(numero) FROM tbl_conta")
         maior_numero = cursor.fetchone()[0]
         
         # Se for a primeira conta, inicia com 1001
@@ -140,11 +140,11 @@ class Banco:
         conexao.close()
         
         #Cria conta corrente se o tipo informado for "corrente"
-        if tipo_conta == 'C':
+        if tipo_db == 'CORRENTE':
             nova_conta = ContaCorrente(numero_conta, cliente)
         
         #Cria conta poupança se o tipo informado for "poupanca"
-        elif tipo_conta == 'P':
+        else:
             nova_conta = ContaPoupanca(numero_conta, cliente)
         
         
@@ -156,7 +156,8 @@ class Banco:
         # Salva a conta no banco.db
         nova_conta.salvar_db()
 
-        print(f'Conta {tipo} nº{numero_conta} criada para o cliente {cliente.nome}')
+        tipo_exibicao = "Corrente" if tipo_db == 'CORRENTE' else "Poupança"
+        print(f'Conta {tipo_exibicao} nº{numero_conta} criada para o cliente {cliente.nome}')
 
         return nova_conta
     
@@ -176,9 +177,9 @@ class Banco:
 
         # Fazemos um SELECT buscando o número da conta
         cursor.execute(""" 
-            SELECT numero_conta, tipo_conta, saldo, limite, tbl_cliente_id_cliente 
+            SELECT numero, tipo_conta, saldo, limite, fk_tbl_cliente_id 
             FROM tbl_conta
-            WHERE numero_conta = ?
+            WHERE numero = ?
         """, (numero_conta,))
         
         # Salva a linha encontrada na variavel linha. fetchone() retorna uma tupla com os valores da linha, ou None se não encontrar nada.
@@ -194,7 +195,7 @@ class Banco:
 
         # Após encontrar a conta, é preciso achar o cliente dono dessa conta atraves do id desempacotado, 
         # para remontar o objeto cliente e depois a conta com todos os dados e métodos ativos.
-        cursor.execute("SELECT nome_cliente, cpf_cliente FROM tbl_cliente WHERE id_cliente = ?", (id_cliente,))
+        cursor.execute("SELECT nome, cpf FROM tbl_cliente WHERE id = ?", (id_cliente,))
         nome_cli, cpf_cli = cursor.fetchone() # Salva nome e cpf do cliente.
 
         # Criação do objeto Cliente em memória, utilizando os dados do banco.
@@ -203,10 +204,10 @@ class Banco:
         cliente_recuperado.id = id_cliente
 
         # Cria a conta em memória novamente, utilizando os dados do banco, a depender do de conta
-        if tipo == 'C':
+        if tipo == 'CORRENTE':
             # Cria o objeto ContaCorrente com os dados do banco
             conta_recuperada = ContaCorrente(numero=num, cliente=cliente_recuperado, limite=limite)
-        elif tipo == 'P':
+        elif tipo == 'POUPANCA':
             # Cria o objeto ContaPoupanca com os dados do banco
             conta_recuperada = ContaPoupanca(numero=num, cliente=cliente_recuperado)
 

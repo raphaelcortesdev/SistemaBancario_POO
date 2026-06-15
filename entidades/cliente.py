@@ -38,21 +38,27 @@ class Cliente:
         conexao = sqlite3.connect(dir_db)
         cursor = conexao.cursor()
 
-        # Executa o INSERT INTO do obj cliente dentro da db
-        cursor.execute(
-            "INSERT INTO tbl_cliente (nome_cliente, cpf_cliente) VALUES (?, ?)", # ? ? -> placeholders para evitar SQL injection
-            (self.nome, self.cpf)
-        )
+        # se o id for None, é um cliente novo e executa o insert
+        if self.id is None:
+            cursor.execute(
+                "INSERT INTO tbl_cliente (nome, cpf) VALUES (?, ?)", 
+                (self.nome, self.cpf)
+            )
+            conexao.commit()
+            
+            self.id = cursor.lastrowid
+            print(f"Sucesso: {self.nome} foi salvo no banco com o ID {self.id}!")
+            
+        # Se o id já existir, apenas atualiza o registro (UPDATE)
+        else:
+            cursor.execute(
+                "UPDATE tbl_cliente SET nome = ?, cpf = ? WHERE id = ?",
+                (self.nome, self.cpf, self.id)
+            )
+            conexao.commit()
+            print(f"Sucesso: Dados do cliente {self.nome} (ID {self.id}) foram atualizados no banco!")
 
-        # Salva a alteração
-        conexao.commit()
-
-        # Guarda o ID gerado pelo banco dentro do objeto cliente no Python
-        self.id = cursor.lastrowid
-
-        # Encerra a conexão
         conexao.close()
-        print(f"Sucesso: {self.nome} foi salvo no banco com o ID {self.id}!")
 
     #Método especial que representa o objeto em string
     def __str__(self):

@@ -49,6 +49,7 @@ def menu_conta(banco):
                 # Deposita valor na conta
                 valor = float(input("Digite o valor para depósito: "))
                 conta.deposito(valor)
+                input("\nDepósito processado. Pressione Enter para voltar ao menu...")
             
             elif opcao == '2':
                 
@@ -57,15 +58,17 @@ def menu_conta(banco):
                     
                     valor = float(input("Digite o valor para saque: "))
                     conta.sacar(valor)  #Polimorfismo: depende do tipo de conta
-                    conta.atualizar_saldo_db()
+                    input("\nSaque processado. Pressione Enter para voltar ao menu...")
                 
                 except SaldoInsuficienteError as e:
                     print(f"Erro na operação: {e}")
+                    input("\nPressione Enter para voltar...")
             
             elif opcao == '3':
                 
                 #Exibe o extrato da conta
                 conta.extrato()
+                input("\nPressione Enter para voltar ao menu...")
             
             elif opcao == '4':
                 
@@ -78,7 +81,7 @@ def menu_conta(banco):
     #Exceção caso a conta não exista
     except ContaInexistenteError as e:
         print(f"Erro: {e}")
-    
+        input("\nPressione Enter para voltar ao menu...")
     #Exceção para entradas inválidas (não numéricas)
     except ValueError:
         print("Erro: Entrada inválida. Por favor, digite um número.")
